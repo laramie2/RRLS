@@ -1,0 +1,30 @@
+__pycache__/
+*.py[cod]
+*.so
+.DS_Store
+.env
+.venv/
+venv/
+
+# Model weights and external benchmark data should stay outside git.
+sd-turbo/
+models/
+pie_bench/
+checkpoints/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+
+# Generated experiment outputs.
+results/
+outputs/
+runs/
+wandb/
+*.csv
+!images/**/*.csv
+
+# Local packaging artifacts.
+build/
+dist/
+*.egg-info/
