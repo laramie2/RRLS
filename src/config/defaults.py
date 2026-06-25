@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-DEFAULT_MODEL_ROOT = "/sd-turbo"
+DEFAULT_MODEL_ROOT = "./sd-turbo"
 DEFAULT_PIE_ROOT = Path("./pie_bench")
 DEFAULT_IMAGE_SUBDIR = "annotation_images"
 DEFAULT_MAPPING_FILE = "mapping_file.json"

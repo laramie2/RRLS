@@ -57,6 +57,14 @@ Put PIE-Bench at the default path or pass `--pie-root`:
   mapping_file.json
 ```
 
+## Demo
+
+```bash
+python app.py
+```
+
+The demo uses the same default model layout and loads local examples from `images/` when available.
+
 ### Pipeline
 
 Run the full export pipeline with:
@@ -86,10 +94,3 @@ By default it writes results to `pie_bench/eval/`:
 - `summary_metrics.csv`
 - `paired_stats.csv`
 
-## Demo
-
-```bash
-python app.py
-```
-
-The demo uses the same default model layout and loads local examples from `images/` when available.
