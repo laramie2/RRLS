@@ -10,7 +10,7 @@ from PIL import Image, ImageOps
 from torch.utils.data import Dataset
 
 
-DEFAULT_DATA_ROOT = Path(__file__).resolve().parent / "images"
+DEFAULT_DATA_ROOT = Path(__file__).resolve().parents[2] / "images"
 _IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
 
 

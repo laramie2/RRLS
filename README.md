@@ -1,158 +1,95 @@
-# RRLS
+<div align="center">
+  <img src="./RRLS_show.gif" alt="RRLS show" width="100%" />
+  
+  <h1>Bridging the Manifold Gap: Riemannian Residual Line Search for One-Step Image Editing</h1>
 
-RRLS is a lightweight release of our image-editing pipeline and evaluation scripts. The code contains three main parts:
+  <a href="https://arxiv.org/abs/2606.24844"><img src="https://img.shields.io/badge/arXiv-2602.19083-b31b1b.svg"></a>
 
-- `pipeline_chord.py`: one-step ChordEdit-style latent editing pipeline.
-- `run_pie_bench.py`: runs the pipeline on PIE-Bench and exports images in PIE-Bench layout.
-- `clip_regularized_line_search.py`: selects the final RRLS output from candidate edits using CLIP target alignment and source residual regularization.
+  <p>
+    <a href="#overview">Overview</a> •
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#pipeline">Pipeline</a> •
+    <a href="#evaluation">Evaluation</a>
+  </p>
+</div>
 
-Model weights, PIE-Bench data, and generated results are not included in this repository.
+## Overview
 
-## Installation
+<img src="./RRLS_overview.png" alt="RRLS overview" width="100%" />
+
+RRLS is a source-preserving image editing method. It first produces a baseline edit, then generates a stronger candidate, and finally selects a residual candidate that better balances prompt alignment with source preservation.
+
+## Quick Start
+
+### Dependency
+
+RRLS needs:
+- Python 3.12
+- PyTorch 2.5.0
+- PIE-Bench data, please refer to [PnPInversion](https://github.com/cure-lab/PnPInversion)
+- Local Stable Diffusion Turbo [checkpoint](https://huggingface.co/stabilityai/sd-turbo)
+- Local CLIP ViT-L/14 [checkpoint](https://huggingface.co/sentence-transformers/clip-ViT-L-14) for evaluation
+
+`DINO ViT-B/8` is downloaded automatically by `torch.hub` during structure-distance evaluation.
+
+### Installation
 
 ```bash
 pip install -r requirement.txt
 ```
 
-The editing pipeline expects a local `sd-turbo` directory with this structure:
+Put the model weights at the default path or pass `--model-root`:
 
 ```text
-sd-turbo/
-|-unet/
-|-scheduler/
-|-text_encoder/
-|-tokenizer/
-|-vae/
+/sd-turbo/
+  unet/
+  scheduler/
+  text_encoder/
+  tokenizer/
+  vae/
 ```
 
-## Run PIE-Bench Generation
-
-The PIE-Bench root should contain:
+Put PIE-Bench at the default path or pass `--pie-root`:
 
 ```text
-pie_bench/
-|-annotation_images/
-|-mapping_file.json
+./pie_bench/
+  annotation_images/
+  mapping_file.json
 ```
 
-Run the baseline edit:
+### Pipeline
+
+Run the full export pipeline with:
 
 ```bash
-python run_pie_bench.py \
-  --model-root /path/to/sd-turbo \
-  --pie-root /path/to/pie_bench \
-  --method-name ChordEdit \
-  --overwrite
+bash run_pipeline.sh
 ```
 
-Run a stronger candidate generator for RRLS:
-
-```bash
-python run_pie_bench.py \
-  --model-root /path/to/sd-turbo \
-  --pie-root /path/to/pie_bench \
-  --method-name RRLSStrong \
-  --transport-mode spectral_curvature \
-  --frequency-reg 0.08 \
-  --frequency-norm-mix 0.5 \
-  --latent-mask-strength 0.8 \
-  --mask-project \
-  --overwrite
-```
-
-Outputs are saved to:
-
-```text
-/path/to/pie_bench/output/<method-name>/annotation_images/
-```
-
-## Run RRLS Selection
-
-RRLS builds residual interpolation candidates between the source image and the stronger edit, then selects the candidate maximizing:
-
-```text
-CLIP(target_prompt, candidate) - lambda_source * MSE(candidate, source)
-```
-
-```bash
-python clip_regularized_line_search.py \
-  --mapping-file /path/to/pie_bench/mapping_file.json \
-  --src-image-folder /path/to/pie_bench/annotation_images \
-  --baseline-image-folder /path/to/pie_bench/output/ChordEdit/annotation_images \
-  --strong-image-folder /path/to/pie_bench/output/RRLSStrong/annotation_images \
-  --output-folder /path/to/pie_bench/output/RRLS/annotation_images \
-  --choices-path /path/to/pie_bench/output/RRLS/choices.csv \
-  --clip-model-path /path/to/clip-vit-large-patch14 \
-  --lambda-source 40.0 \
-  --alpha 0.55 0.65 0.75 0.85
-```
-
-For a residual-only ablation:
-
-```bash
-python mse_residual_selector.py \
-  --mapping-file /path/to/pie_bench/mapping_file.json \
-  --src-image-folder /path/to/pie_bench/annotation_images \
-  --baseline-image-folder /path/to/pie_bench/output/ChordEdit/annotation_images \
-  --strong-image-folder /path/to/pie_bench/output/RRLSStrong/annotation_images \
-  --output-folder /path/to/pie_bench/output/MSESelector/annotation_images
-```
+By default it writes:
+- `pie_bench/output/ChordEdit/annotation_images`
+- `pie_bench/output/RRLSStrong/annotation_images`
+- `pie_bench/output/RRLS/annotation_images`
 
 ## Evaluation
 
-PIE-style preservation and CLIP metrics:
+Evaluation is performed on PIE-Bench. It reads source images from `pie_bench/annotation_images`, annotations from `pie_bench/mapping_file.json`, and method outputs from `pie_bench/output/<method>/annotation_images`.
+
+Run the full evaluation with:
 
 ```bash
-python evaluate_pie_chord.py \
-  --mapping-file /path/to/pie_bench/mapping_file.json \
-  --src-image-folder /path/to/pie_bench/annotation_images \
-  --method ChordEdit=/path/to/pie_bench/output/ChordEdit/annotation_images \
-  --method RRLS=/path/to/pie_bench/output/RRLS/annotation_images \
-  --result-path results/pie_metrics.csv \
-  --summary-path results/pie_metrics_summary.csv \
-  --clip-model-path /path/to/clip-vit-large-patch14
+bash run_eval.sh
 ```
 
-DINO self-similarity structure distance:
+By default it writes results to `pie_bench/eval/`:
+- `per_sample_metrics.csv`
+- `structure_metrics.csv`
+- `summary_metrics.csv`
+- `paired_stats.csv`
+
+## Demo
 
 ```bash
-python evaluate_structure_distance.py \
-  --mapping-file /path/to/pie_bench/mapping_file.json \
-  --src-image-folder /path/to/pie_bench/annotation_images \
-  --method ChordEdit=/path/to/pie_bench/output/ChordEdit/annotation_images \
-  --method RRLS=/path/to/pie_bench/output/RRLS/annotation_images \
-  --result-path results/structure_distance.csv \
-  --summary-path results/structure_distance_summary.csv
+python app.py
 ```
 
-Paired statistics:
-
-```bash
-python analyze_crls_statistics.py \
-  --metric-csv results/pie_metrics.csv \
-  --structure-csv results/structure_distance.csv \
-  --baseline-method ChordEdit \
-  --rrls-method RRLS \
-  --output-csv results/rrls_paired_statistics.csv
-```
-
-## Optional Utilities
-
-Project edited images back to the source outside PIE masks:
-
-```bash
-python apply_mask_projection.py \
-  --mapping-file /path/to/pie_bench/mapping_file.json \
-  --src-image-folder /path/to/pie_bench/annotation_images \
-  --edited-image-folder /path/to/pie_bench/output/RRLS/annotation_images \
-  --output-folder /path/to/pie_bench/output/RRLSProjected/annotation_images \
-  --overwrite
-```
-
-Convert parquet PIE-Bench data into the expected folder layout:
-
-```bash
-python prepare_pie_bench_pp.py \
-  --input /path/to/pie_bench.parquet \
-  --output /path/to/pie_bench
-```
+The demo uses the same default model layout and loads local examples from `images/` when available.

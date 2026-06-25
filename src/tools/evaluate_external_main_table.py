@@ -166,7 +166,7 @@ def run_evaluator(
 ) -> None:
     command = [
         sys.executable,
-        str(ROOT / "evaluate_pie_chord.py"),
+        str(ROOT / "src/eval/eval_all.py"),
         "--mapping-file",
         str(mapping_file),
         "--src-image-folder",

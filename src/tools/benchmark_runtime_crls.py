@@ -108,7 +108,7 @@ def main() -> None:
 
     common = [
         sys.executable,
-        "run_pie_bench.py",
+        "src/pipeline/run_pipeline.py",
         "--model-root",
         args.model_root,
         "--pie-root",
@@ -164,7 +164,7 @@ def main() -> None:
         "CRLS selector",
         [
             sys.executable,
-            "clip_regularized_line_search.py",
+            "src/pipeline/residual_selector_clip.py",
             "--mapping-file",
             str(subset_mapping),
             "--src-image-folder",

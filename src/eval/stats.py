@@ -27,11 +27,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Compute paired RRLS-vs-baseline statistics from evaluation CSV files."
     )
-    parser.add_argument("--metric-csv", required=True, help="CSV produced by evaluate_pie_chord.py.")
+    parser.add_argument("--metric-csv", required=True, help="CSV produced by src/eval/eval_all.py.")
     parser.add_argument(
         "--structure-csv",
         default=None,
-        help="Optional CSV produced by evaluate_structure_distance.py.",
+        help="Optional CSV produced by src/eval/eval_all.py.",
     )
     parser.add_argument("--baseline-method", default="ChordEdit")
     parser.add_argument("--rrls-method", default="RRLS")

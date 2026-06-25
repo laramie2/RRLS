@@ -5,24 +5,22 @@ This folder is a clean GitHub-ready package assembled from the working ChordEdit
 ## Included
 
 - Core method code:
-  - `pipeline_chord.py`
-  - `run_pie_bench.py`
-  - `clip_regularized_line_search.py`
-  - `mse_residual_selector.py`
-  - `apply_mask_projection.py`
+  - `src/pipeline/chord_pipeline.py`
+  - `src/pipeline/run_pipeline.py`
+  - `src/pipeline/residual_selector_clip.py`
+  - `src/pipeline/residual_selector_mse.py`
+  - `src/tools/apply_mask_projection.py`
 - Evaluation scripts:
-  - `evaluate_pie_chord.py`
-  - `evaluate_structure_distance.py`
-  - `analyze_crls_statistics.py`
-  - `tools/*.py`
+  - `src/eval/eval_pie_metrics.py`
+  - `src/eval/eval_structure_distance.py`
+  - `src/eval/eval_all.py`
+  - `src/eval/stats.py`
+  - `src/tools/*.py`
 - Demo and documentation files:
   - `app.py`
-  - `images/`
-  - `chord_app.png`
-  - `chord_show.gif`
+  - `src/`
   - `README.md`
   - `requirement.txt`
-  - `LICENSE`
 
 ## Excluded
 

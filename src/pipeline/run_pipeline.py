@@ -12,8 +12,9 @@ import numpy as np
 import torch
 from PIL import Image
 
-from pipeline_chord import ChordEditPipeline
-from utils import first_param_point, load_yaml_config
+from src.config.defaults import DEFAULT_MODEL_ROOT, DEFAULT_IMAGE_SUBDIR, DEFAULT_METHOD_NAME
+from src.pipeline.chord_pipeline import ChordEditPipeline
+from src.utils.io_utils import first_param_point, load_yaml_config
 
 
 LOGGER = logging.getLogger("pie_bench")
@@ -26,7 +27,6 @@ COMPONENT_SUBDIRS: Dict[str, str] = {
     "tokenizer_path": "tokenizer",
     "vae_path": "vae",
 }
-DEFAULT_MODEL_ROOT = "/sd-turbo"
 DEFAULT_COMPONENT_PATHS: Dict[str, str] = {
     key: str(Path(DEFAULT_MODEL_ROOT) / subdir) for key, subdir in COMPONENT_SUBDIRS.items()
 }
@@ -59,10 +59,8 @@ DEFAULT_EDIT_CONFIG = {
 DEFAULT_SEED = 42
 DEFAULT_PRECISION = "fp32"
 
-DEFAULT_PIE_ROOT = Path(__file__).resolve().parent / "pie_bench"
+DEFAULT_PIE_ROOT = Path("./pie_bench")
 DEFAULT_MAPPING_FILE = "mapping_file.json"
-DEFAULT_IMAGE_SUBDIR = "annotation_images"
-DEFAULT_METHOD_NAME = "ChordEdit"
 
 
 @dataclass(frozen=True)
