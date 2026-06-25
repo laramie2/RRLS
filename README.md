@@ -41,7 +41,7 @@ pip install -r requirement.txt
 Put the model weights at the default path or pass `--model-root`:
 
 ```text
-/sd-turbo/
+./sd-turbo/
   unet/
   scheduler/
   text_encoder/
